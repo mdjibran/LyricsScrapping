@@ -1,9 +1,14 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-from _overlapped import NULL
-
 
 url = "https://www.azlyrics.com/"
+pages = []
+alphas = 'abcdefghijklmnopqrstuvwxyz'
+
+for a in list(alphas):
+    pages.append(url + a +".html/")
+pages.append(url + "19.html/")
+
 def getPage(url):
     page = urlopen(url)
     soup = BeautifulSoup(page, "html.parser")
@@ -16,29 +21,27 @@ def getListLink(aClassName, divClassName, url):
         for link in a.find_all("a", class_=aClassName):
             content += str(link) + "," + "http:"+link.get("href") + "\n"        
 
+existing = pages
+#url = existing[0]
 
-completed = open("completed.csv", "r+")
-existing = completed.readlines()  
-
-url = existing[0].split(',')[1]
-artist = getPage(url)
+artist = getPage(existing[0])
 songsList = []
 menu = artist.find_all("div", class_='col-sm-6 text-center artist-col')
 for a in menu:
     for link in a.find_all("a"):
-        songsList.append("http://www.azlyrics.com/"+link.get("href") + "\n")
+        songsList.append(url +link.get("href") + "\n")
 
 
 print(songsList[0])
-url = songsList[0]
-albumList = getPage(url)
+#url = songsList[0]
+albumList = getPage(songsList[0])
 print(albumList.title)
 id = 0
 
 menu = albumList.find_all("div", id="listAlbum")
 for a in menu:
     for link in a.find_all("a"):
-        songUrl = "https://www.azlyrics.com/"+str(link.get("href")).replace("../","")
+        songUrl = url +str(link.get("href")).replace("../","")
         if not str(songUrl).endswith("/None"):
             print(songUrl)
             id += 1
